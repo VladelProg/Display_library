@@ -1,0 +1,3 @@
+library for MElT for STM32 microcontrollers using HAL drivers.
+
+Folder - example project for STM32CubeIDE and STM32CubeMX
