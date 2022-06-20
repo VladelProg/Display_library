@@ -1,0 +1,40 @@
+.macro   SetPixel
+      ldi      YL, low(pixelBuffer+@0 + (@1 / 8) * SSD1306_X_SIZE)         ; [x + (y / 8) * X_SIZE]
+      ldi      YH, high(pixelBuffer+ @0 + (@1 / 8) * SSD1306_X_SIZE)      ;
+      ldi      ACC, @1                                          ; (Y) -> ACC
+      rcall   _SetPixel
+.endm
+; óñòàíîâêà ïèêñåëÿ â ìàññèâå
+_setPixel:
+         ldi      temp, 8
+         rcall   div8u_c
+         ld      ACC, Y
+         inc      temp2
+         CLC                  ; C = 0
+         push   temp2
+set_bit:   ror      ACC
+         DJNZR   temp2, set_bit
+         SEC                  ; ? = 1
+         pop      temp2
+set_bit_1:   rol      ACC
+         DJNZR   temp2, set_bit_1
+         st      Y, ACC                  ; ACC -> (Y)
+         ret
+; âûâîä 8-ìè ðàçðÿäíûõ áåççíàêîâûõ ÷èñåë
+div8u_c:
+      sub temp2,   temp2
+      ldi temp1,   9
+d8u_1: rol ACC
+      dec temp1
+      brne d8u_2
+      ret
+d8u_2:
+      rol temp2
+      sub temp2,   temp
+      brcc d8u_3
+      add temp2,   temp
+      clc
+      rjmp d8u_1
+d8u_3:
+      sec
+      rjmp d8u_1    
